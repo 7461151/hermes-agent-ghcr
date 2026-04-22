@@ -50,6 +50,7 @@ RUN uv venv && \
     uv pip install --no-cache-dir -e ".[all]"
 
 # ---------- Runtime ----------
+USER root
 RUN chmod +x /opt/hermes/docker/entrypoint.sh
 
 ENV HERMES_WEB_DIST=/opt/hermes/hermes_cli/web_dist
