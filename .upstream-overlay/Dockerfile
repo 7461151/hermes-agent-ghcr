@@ -8,6 +8,9 @@ ENV PYTHONUNBUFFERED=1
 # Store Playwright browsers outside the volume mount so the build-time
 # install survives the /opt/data volume overlay at runtime.
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/hermes/.playwright
+# agent-browser does not automatically discover Playwright's versioned
+# chrome-headless-shell path in this image, so expose it via a stable symlink.
+ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/local/bin/hermes-chrome
 
 # Install system dependencies in one layer, clear APT cache
 RUN apt-get update && \
@@ -32,6 +35,9 @@ COPY web/package.json web/package-lock.json web/
 
 RUN npm install --prefer-offline --no-audit && \
     npx playwright install --with-deps chromium --only-shell && \
+    PLAYWRIGHT_CHROME="$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f -name chrome-headless-shell | head -n 1)" && \
+    test -n "$PLAYWRIGHT_CHROME" && \
+    ln -sf "$PLAYWRIGHT_CHROME" "$AGENT_BROWSER_EXECUTABLE_PATH" && \
     (cd scripts/whatsapp-bridge && npm install --prefer-offline --no-audit) && \
     (cd web && npm install --prefer-offline --no-audit) && \
     npm cache clean --force
