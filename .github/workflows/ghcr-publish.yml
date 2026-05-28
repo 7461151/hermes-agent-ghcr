@@ -189,10 +189,9 @@ jobs:
 
       - name: Test image starts
         run: |
-          docker run --rm \
-            -v /tmp/hermes-test:/opt/data \
-            --entrypoint /opt/hermes/docker/entrypoint.sh \
-            hermes-agent:test --help
+          docker run --rm \\\\
+            -v /tmp/hermes-test:/opt/data \\\\
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test --help
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
